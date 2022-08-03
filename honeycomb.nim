@@ -85,6 +85,7 @@ runnableExamples:
 import strutils
 import sequtils
 import macros
+import std/enumerate
 
 when defined(js):
   import jsffi
@@ -100,7 +101,7 @@ else:
   import re
 
 from sugar import `=>`, `->`
-
+from std/terminal import styledWriteLine, resetStyle, bgRed, bgGreen
 
 # === Core Types ===
 
@@ -183,6 +184,24 @@ func error*(result1: ParseResult, showPos: bool = true): string =
   case expected.len:
     of 1: return "$1Expected $2" % [posStr, expected[0]]
     else: return "$1Expected one of $2" % [posStr, expected.join(", ")]
+
+proc debugOutput*(result1: ParseResult) =
+  if result1.kind == success:
+    if result1.tail.len != 0:
+      stdout.styledWriteLine("OK, tail: ", bgGreen, result1.tail, resetStyle)
+  else:
+    let
+      problemAtLine = result1.lineInfo[0] - 1
+      problemAtCol = result1.lineInfo[1] - 1
+    for (i, line) in enumerate(result1.fromInput.split("\p")):
+      if i != problemAtLine:
+        echo line
+      else:
+        let
+          beforeError = result1.fromInput[0..<problemAtCol]
+          errorChar = $result1.fromInput[problemAtCol]
+          afterError = result1.fromInput[problemAtCol+1 .. result1.fromInput.high]
+        stdout.styledWriteLine(beforeError, bgRed, errorChar, resetStyle, afterError)
 
 template raiseIfFailed*(result1: ParseResult) =
   ## Raise an exception if the given `ParseResult` is failed.
