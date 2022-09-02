@@ -187,8 +187,7 @@ func error*(result1: ParseResult, showPos: bool = true): string =
 
 proc debugOutput*(result1: ParseResult) =
   if result1.kind == success:
-    if result1.tail.len != 0:
-      stdout.styledWriteLine("OK, tail: ", bgGreen, result1.tail, resetStyle)
+    stdout.styledWriteLine(fgGreen, result1.fromInput, resetStyle, bgGreen, result1.tail, resetStyle)
   else:
     let
       problemAtLine = result1.lineInfo[0] - 1
