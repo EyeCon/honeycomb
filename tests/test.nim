@@ -63,6 +63,28 @@ suite "core parsers":
     check result3.tail      == "Ahoy there!"
     check result3.fromInput == "Ahoy there!"
 
+  test "character of set":
+    let 
+      parser  = c({'G', 'H'})
+      result1 = parser.parse("Hello, world!")
+      result2 = parser.parse("Greetings, peasants!")
+      result3 = parser.parse("Ahoy there!")
+
+    check result1.kind      == success
+    check result1.value     == 'H'
+    check result1.tail      == "ello, world!"
+    check result1.fromInput == "Hello, world!"
+
+    check result2.kind      == success
+    check result2.value     == 'G'
+    check result2.tail      == "reetings, peasants!"
+    check result2.fromInput == "Greetings, peasants!"
+
+    check result3.kind      == failure
+    check result3.error     == "[1:1] Expected character from '{'G', 'H'}'"
+    check result3.tail      == "Ahoy there!"
+    check result3.fromInput == "Ahoy there!"
+
   test "character of range":
     let 
       parser  = c('G'..'H')
@@ -628,6 +650,23 @@ suite "general combinators":
     check result2.error     == "[1:13] Expected 'Hello '"
     check result2.tail      == ""
     check result2.fromInput == "Hello Hello "
+
+  test "validate":
+    let
+      parser1 = digit.atLeast(3).map(a => a.join().parseInt)
+      parser2 = digit.atLeast(3).map(a => a.join().parseInt).validate(a => a < 500, "integer less than 500")
+      result1 = parser1.parse("345")
+      result2 = parser1.parse("678")
+      result3 = parser2.parse("345")
+      result4 = parser2.parse("678")
+    check result1.kind      == success
+    check result1.value     == 345
+    check result2.kind      == success
+    check result2.value     == 678
+    check result3.kind      == success
+    check result3.value     == 345
+    check result4.kind      == failure
+    check result4.error     == "[1:1] Expected integer less than 500"
 
   test "join delimited":
     let
