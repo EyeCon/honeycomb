@@ -452,34 +452,6 @@ func filter*[T](a: Parser[seq[T]], fn: proc(x: T): bool): Parser[seq[T]] =
   ## - [validate](#validate,Parser[T],proc(T),string)
   a.mapEach((x: T) => (if fn(x): @[x] else: newSeq[T]())).flatten
 
-func validate*[T](p: Parser[T], fn: proc(x: T): bool, expected: string): Parser[T] =
-  ## Validate the result of a successful parse by the given predicate, failing if it returns `false`.
-  ##
-  ## See also:
-  ## - [map](#map,Parser[T],proc(T))
-  ## - [mapEach](#mapEach,Parser[seq[T]],proc(T))
-  ## - [result](#result.t,Parser,T)
-  ## - [filter](#filter.t,Parser[seq[T]],proc(T))
-  runnableExamples:
-    from std/strutils import parseInt
-    from std/sugar import `=>`
-    let
-      parser  = digit.atLeast(1).join.map(a => a.parseInt)
-        .validate(a => a < 500, "number less than 500")
-      result1 = parser.parse("874")
-      result2 = parser.parse("323")
-
-    assert result1.kind == failure
-    assert result2.kind == success
-
-  createParser(T):
-    let result1 = p.parse(input)
-    case result1.kind
-    of ParseResultKind.failure: return result1
-    of ParseResultKind.success:
-      if fn(result1.value): return result1
-      return fail(input, @[expected], input)
-
 func `|`*[T](a, b: Parser[T]): Parser[T] =
   ## Succeeds if either parser succeeds, attempting them from left to right.
   ##
