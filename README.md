@@ -43,7 +43,7 @@ import honeycomb
 
 ## Usage
 
-You can find extensive documentation on using Honeycomb [here](https://katrinakitten.github.io/honeycomb).
+You can find extensive documentation on using Honeycomb [here](https://kgscialdone.github.io/honeycomb/honeycomb.html).
 
 For a more in-depth conceptual look at parser combinators in general, you can try these resources:
 
