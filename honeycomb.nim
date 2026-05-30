@@ -330,7 +330,7 @@ func c*(expect: char): Parser[char] =
     fail(input, @["'$1'" % $expect], input)
 
 func c*(expect: string | set): Parser[char] =
-  ## Creates a parser matching any one character from the given string.
+  ## Creates a parser matching any one character from the given string or set.
   runnableExamples:
     let
       parser = c("HIJK")
